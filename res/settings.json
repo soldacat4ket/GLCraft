@@ -2,9 +2,11 @@
     "gamesettings": {
     },
     "inputsettings": {
-        "sensitivity":  1.0
+        "sensitivity":  2
     },
     "graphicssettings": {
+        "resolution": [ 1920, 1080 ],
+        "fullscreen":  true
     },
     "texturesettings": {
         "activepack": "Default"

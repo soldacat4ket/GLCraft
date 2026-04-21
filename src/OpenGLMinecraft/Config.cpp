@@ -30,32 +30,14 @@ void Config::Load(const std::filesystem::path& p_ConfigPath, const std::filesyst
 
     nlohmann::json ConfigData = nlohmann::json::parse(ConfigHandle);
 
+    LoadGraphicsSettings(ConfigData.at("graphicssettings"));
     LoadInputSettings(ConfigData.at("inputsettings"));
-    LoadTexturePacks(ConfigData.at("texturesettings"));
+
+    // save to a temporary object since pack loading must be done after the context has be created
+    m_TempTextureData = ConfigData.at("texturesettings");
 }
 
-
-std::unordered_map<std::string, CachedBlockTextureInfo> Config::BuildTextureReferences()
-{
-    // todo: potentially add stacking logic for a minecraft-like list of active texture packs
-    // for now just upload the active packs image to the gpu
-    m_ActivePack->UploadTexture();
-    // and return the map of texture coordinates to block ids
-    return m_ActivePack->ConsumeTextureReferences();
-}
-
-Config::Config()
-    :m_ActivePack(nullptr), m_InputSettings({1.0f})
-{
-
-}
-
-void Config::LoadInputSettings(const nlohmann::json& p_InputSettingsData)
-{
-    m_InputSettings.UserSensitivity = p_InputSettingsData.at("sensitivity").get<float>();
-}
-
-void Config::LoadTexturePacks(const nlohmann::json& p_TextureConfigData)
+void Config::LoadTexturePacks()
 {
     // scan for all json files in packs folder
     std::vector<std::filesystem::path> FoundPacks;
@@ -68,7 +50,7 @@ void Config::LoadTexturePacks(const nlohmann::json& p_TextureConfigData)
         }
     }
 
-    m_ActivePackName = p_TextureConfigData.at("activepack").get<std::string>();
+    m_ActivePackName = m_TempTextureData.at("activepack").get<std::string>();
     LOG_INFO("Searching for pack {}", m_ActivePackName);
 
     // search for active pack by name and load it
@@ -88,4 +70,32 @@ void Config::LoadTexturePacks(const nlohmann::json& p_TextureConfigData)
     }
 
     ASSERT(HasFoundPack);
+    m_TempTextureData.clear();
+}
+
+std::unordered_map<std::string, CachedBlockTextureInfo> Config::BuildTextureReferences()
+{
+    // todo: potentially add stacking logic for a minecraft-like list of active texture packs
+    // for now just upload the active packs image to the gpu
+    m_ActivePack->UploadTexture();
+    // and return the map of texture coordinates to block ids
+    return m_ActivePack->ConsumeTextureReferences();
+}
+
+Config::Config()
+    :m_ActivePack(nullptr), m_InputSettings({1.0f})
+{
+
+}
+
+void Config::LoadGraphicsSettings(const nlohmann::json& p_GraphicsSettingsData)
+{
+    m_GraphicsSettings.DesiredWidthPixels = p_GraphicsSettingsData.at("resolution").at(0).get<unsigned int>();
+    m_GraphicsSettings.DesiredHeightPixels = p_GraphicsSettingsData.at("resolution").at(1).get<unsigned int>();
+    m_GraphicsSettings.Fullscreen = p_GraphicsSettingsData.at("fullscreen").get<bool>();
+}
+
+void Config::LoadInputSettings(const nlohmann::json& p_InputSettingsData)
+{
+    m_InputSettings.UserSensitivity = p_InputSettingsData.at("sensitivity").get<float>();
 }

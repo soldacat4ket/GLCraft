@@ -61,20 +61,25 @@ void OpenGLMinecraft::Quit()
 
 void OpenGLMinecraft::OnInit()
 {
-    m_RenderWindow = std::make_unique<RenderWindow>("OpenGLMinecraft", 800, 600, false);
+    Config::Get().Load();
+    BlockDatabase::Get().LoadBlocks(Config::Get().GetBlockDataPath());
 
+    m_RenderWindow = std::make_unique<RenderWindow>(
+        "OpenGLMinecraft", 
+        Config::Get().GetGraphicsSettings().DesiredWidthPixels, 
+        Config::Get().GetGraphicsSettings().DesiredHeightPixels, 
+        Config::Get().GetGraphicsSettings().Fullscreen
+    );
     m_RenderWindow->SetGLCapability(RenderWindow::RendererCapability::DEPTHTESTING, true);
-#ifdef NDEBUG
-    m_RenderWindow->SetGLCapability(RenderWindow::RendererCapability::CULLFACE, true); // if not in debug mode cull all backfaces
-#endif
+    m_RenderWindow->SetGLCapability(RenderWindow::RendererCapability::CULLFACE, true);
+
+    // input objects
     m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
     m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
     m_Camera = std::make_unique<Camera>(m_RenderWindow->GetWindowData().AspectRatioF);
 
-    // config must be loaded after the window is created since it loads textures which need an opengl context
-    Config::Get().Load();
-    BlockDatabase::Get().LoadBlocks(Config::Get().GetBlockDataPath());
-    // add precalculated texture data from the pack to the blockdatabase
+
+    Config::Get().LoadTexturePacks();
     BlockDatabase::Get().RegisterReferenceMap(Config::Get().BuildTextureReferences());
 
     m_Renderer = std::make_unique<ChunkRenderer>(Config::Get().GetActivePack()->GetTexture());

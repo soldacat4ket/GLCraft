@@ -19,12 +19,23 @@ public:
               const std::filesystem::path& p_BlockDataPath = DEFAULT_BLOCKDATA_FILE, 
               const std::filesystem::path& p_TexturePath = DEFAULT_TEXTURE_PATH);
 
+    void LoadTexturePacks();
+
     std::unordered_map<std::string, CachedBlockTextureInfo> BuildTextureReferences();
 
     inline const TexturePack* GetActivePack() const { return m_ActivePack.get(); }
+    inline const std::string& GetActivePackName() const { return m_ActivePackName; }
+
     inline const std::filesystem::path& GetTexturePath() const { return m_TexturePath; }
     inline const std::filesystem::path& GetBlockDataPath() const { return m_BlockDataPath; }
-    inline const std::string& GetActivePackName() const { return m_ActivePackName; }
+
+    struct GraphicsSettings
+    {
+        unsigned int DesiredWidthPixels;
+        unsigned int DesiredHeightPixels;
+        bool Fullscreen;
+    };
+    inline const GraphicsSettings& GetGraphicsSettings() const { return m_GraphicsSettings; }
 
     struct InputSettings
     {
@@ -34,11 +45,14 @@ public:
 
 private:
     Config();
-
+    
+    void LoadGraphicsSettings(const nlohmann::json& p_GraphicsSettingsData);
     void LoadInputSettings(const nlohmann::json& p_InputSettingsData);
-    void LoadTexturePacks(const nlohmann::json& p_TextureConfigData);
+
+    nlohmann::json m_TempTextureData;
 
     std::unique_ptr<TexturePack> m_ActivePack;
+    GraphicsSettings m_GraphicsSettings;
     InputSettings m_InputSettings;
     std::filesystem::path m_TexturePath;
     std::filesystem::path m_BlockDataPath;
