@@ -14,10 +14,8 @@ TexturePack::TexturePack(const std::filesystem::path& p_PackFile)
     std::ifstream PackHandle(m_PackFile);
     ASSERT(PackHandle.is_open());
 
-    // load block name as skeleton for s
+    // load pack name only for searching purposes before full loading
     m_PackName = nlohmann::json::parse(PackHandle).at("packname").get<std::string>();
-
-    Load();
 }
 
 void TexturePack::Load()
