@@ -5,8 +5,8 @@ workspace "OpenGLMinecraftClone"
 project "OpenGLMinecraftClone"
 	language "C++"
 	cppdialect "C++23"
-	targetdir "bin/%{cfg.longname}"
-	objdir "bin-int/%{cfg.longname}"
+	targetdir "bin/%{cfg.buildcfg}-%{cfg.platform}"
+	objdir "bin-int/%{cfg.buildcfg}-%{cfg.platform}"
 
 	files { 
 		"src/**.h", 
@@ -18,18 +18,18 @@ project "OpenGLMinecraftClone"
 	
 	-- 64 bit version of GLFW, be sure to replace all libs to their correct version
 	-- will eventaully be updated to compile as a project in our solution
-	libdirs { "vendor\glfw-3.4.bin.WIN64\lib-vc2022" }
+	libdirs { "vendor/glfw-3.4.bin.WIN64/lib-vc2022" }
 	
 	links { "glfw3dll" }
 	
 	includedirs { 
 		"src", 
-		"vendor\glfw-3.4.bin.WIN64\include",
-		"vendor\glad\include", 
-		"vendor\glm",
-		"vendor\stb_image",
-		"vendor\nlohmann-json\include",
-		"vendor\spdlog-1.x\include"
+		"vendor/glfw-3.4.bin.WIN64/include",
+		"vendor/glad/include", 
+		"vendor/glm",
+		"vendor/stb_image",
+		"vendor/nlohmann-json/include",
+		"vendor/spdlog-1.x/include"
 	}
 
 	filter { "configurations:Debug" }
