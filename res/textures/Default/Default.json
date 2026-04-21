@@ -1,0 +1,24 @@
+{
+    "packname": "Default",
+    "packdescription": "Some textures ripped straight from the internet, much better than what I can do.",
+    "atlasfile": "256px_terrain",
+    "atlasformat": "png",
+    "gridsize": [ 16, 16 ],
+
+    "references": {
+        "vanilla:bedrock_block": {
+            "texall": [ 1, 1 ]
+        },
+        "vanilla:grass_block": {
+            "textop": [ 0, 0 ],
+            "texbot": [ 2, 0 ],
+            "texside": [ 3, 0 ]
+        },
+        "vanilla:dirt_block": {
+            "texall": [ 2, 0 ]
+        },
+        "vanilla:stone_block": {
+            "texall": [ 1, 0 ]
+        }
+    }
+}

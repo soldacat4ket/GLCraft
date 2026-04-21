@@ -1,0 +1,22 @@
+{
+    "packname": "ProgrammerArt",
+    "packdescription": "The horrid programmer art I made to distract myself from the reality of having to code in c++.",
+    "atlasfile": "PackAtlas",
+    "atlasformat": "png",
+    "gridsize": [ 4, 4 ],
+
+    "references": {
+        "vanilla:bedrock_block": {
+            "texall": [ 0, 1 ]
+        },
+        "vanilla:grass_block": {
+            "texall": [ 1, 0 ]
+        },
+        "vanilla:dirt_block": {
+            "texall": [ 2, 0 ]
+        },
+        "vanilla:stone_block": {
+            "texall": [ 3, 0 ]
+        }
+    }
+}

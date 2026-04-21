@@ -1,0 +1,37 @@
+{
+    "vanilla:air": {
+        "name": "Air",
+        "opaque": false,
+        "collidable": false,
+        "meshtype": "block",
+        "shadertype": "block"
+    },
+    "vanilla:bedrock_block": {
+        "name": "Bedrock",
+        "opaque": true,
+        "collidable": true,
+        "meshtype": "block",
+        "shadertype": "block"
+    },
+    "vanilla:grass_block": {
+        "name": "Grass",
+        "opaque": true,
+        "collidable": true,
+        "meshtype": "block",
+        "shadertype": "block"
+    },
+    "vanilla:dirt_block": {
+        "name": "Dirt",
+        "opaque": true,
+        "collidable": true,
+        "meshtype": "block",
+        "shadertype": "block"
+    },
+    "vanilla:stone_block": {
+        "name": "Stone",
+        "opaque": true,
+        "collidable": true,
+        "meshtype": "block",
+        "shadertype": "block"
+    } 
+}
