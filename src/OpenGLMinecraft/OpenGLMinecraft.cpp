@@ -37,6 +37,8 @@ void OpenGLMinecraft::Start()
     double LastTime = glfwGetTime(); // Time of last frame
 
     do {
+        m_Running = !m_RenderWindow->ShouldClose();
+
         double CurrentTime = glfwGetTime();
         DeltaTime = CurrentTime - LastTime;
         LastTime = CurrentTime;
@@ -47,8 +49,6 @@ void OpenGLMinecraft::Start()
         OnRender();
         m_RenderWindow->Swap();
         m_RenderWindow->Poll();
-
-        m_Running = !m_RenderWindow->ShouldClose();
     } while(m_Running);
 }
 
