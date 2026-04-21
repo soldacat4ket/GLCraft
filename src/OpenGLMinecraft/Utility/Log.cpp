@@ -31,7 +31,7 @@ void Log::Init(
     }
     catch(const spdlog::spdlog_ex& ex)
     {
-        std::cerr << "You really fucked up now. Heres why you're stupid ->" << ex.what() << "\n";
+        std::cerr << "Log initialization failed: " << ex.what() << "\n";
         ASSERT(false);
     }
 }

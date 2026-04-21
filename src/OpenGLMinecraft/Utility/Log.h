@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <cstdint>
 #include <filesystem>
 
 #define SPDLOG_USE_STD_FORMAT
