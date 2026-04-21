@@ -13,7 +13,7 @@ BlockIdExchanger::BlockIdExchanger(const std::vector<std::string>& p_Ids)
 
 void BlockIdExchanger::Generate(const std::vector<std::string>& p_Ids)
 {
-    LOG_DEBUG("Generating BlockID map");
+    LOG_INFO("Generating BlockID map");
     m_MasterIdArray.clear();
     m_FastStringMap.clear();
     for(int i = 0; i < p_Ids.size(); i++)

@@ -69,7 +69,7 @@ void Config::LoadTexturePacks(const nlohmann::json& p_TextureConfigData)
     }
 
     m_ActivePackName = p_TextureConfigData.at("activepack").get<std::string>();
-    LOG_DEBUG("Searching for pack {}", m_ActivePackName);
+    LOG_INFO("Searching for pack {}", m_ActivePackName);
 
     // search for active pack by name and load it
     bool HasFoundPack = false;
