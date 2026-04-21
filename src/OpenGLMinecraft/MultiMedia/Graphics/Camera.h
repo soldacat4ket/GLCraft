@@ -36,7 +36,6 @@ public:
     inline float GetYaw() const { return m_Yaw; }
     inline float GetPitch() const { return m_Pitch; }
 
-    // update to build matrices only when needed and simply return them
     // matrix getters
     inline glm::mat4 GetViewMatrix() const { return glm::lookAt(m_Position, m_Position + m_Front, m_Up); }
     inline glm::mat4 GetProjectionMatrix() const { return glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_Near, m_Far); }

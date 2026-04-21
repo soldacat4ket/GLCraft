@@ -71,8 +71,9 @@ void OpenGLMinecraft::OnInit()
         Config::Get().GetGraphicsSettings().Fullscreen
     );
     m_RenderWindow->SetGLCapability(RenderWindow::RendererCapability::DEPTHTESTING, true);
+    #ifdef NDEBUG
     m_RenderWindow->SetGLCapability(RenderWindow::RendererCapability::CULLFACE, true);
-
+    #endif
     // input objects
     m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
     m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
