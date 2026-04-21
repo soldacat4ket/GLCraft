@@ -32,6 +32,11 @@ project "OpenGLMinecraftClone"
 		"vendor/spdlog-1.x/include"
 	}
 
+	postbuildcommands {
+      "{COPYFILE} %{path.getabsolute('vendor/glfw-3.4.bin.WIN64/lib-vc2022/glfw3.dll')} %{cfg.targetdir}",
+	  "{COPYDIR} %{path.getabsolute('res')} %{cfg.targetdir}/res"
+	}
+
 	filter { "configurations:Debug" }
 		kind  "ConsoleApp"
 		defines { "_DEBUG" }
