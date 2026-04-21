@@ -83,8 +83,8 @@ void OpenGLMinecraft::OnInit()
     Chunk GreedyChunk = Chunk(glm::ivec3(0, 0, 0));
     GreedyChunk.Superflat();
     GreedyChunkMeshGenerator g;
-    auto ChunkMesh = g.Consume(GreedyChunk);
-    m_UploadedMesh = std::make_unique<GPUMesh>(ChunkMesh.GetMesh());
+    auto GreedyChunkMesh = g.Consume(GreedyChunk);
+    m_UploadedMesh = std::make_unique<GPUMesh>(GreedyChunkMesh.GetMesh());
 
     // another superflat directly next to other, meshed without optimization
     Chunk NormalChunk = Chunk(glm::ivec3(0, 0, 1));
@@ -112,8 +112,8 @@ void OpenGLMinecraft::OnUpdate(double DeltaTime)
     const Mouse::MousePos& MouseDelta = m_Mouse->GetState().MouseDelta;
 
     const float FlatCameraRotationAmount = 0.1f;
-    const float FinalCameraRoation = FlatCameraRotationAmount * Config::Get().GetInputSettings().UserSensitivity;
-    m_Camera->Rotate((float)MouseDelta.x * FinalCameraRoation, (float)MouseDelta.y * FinalCameraRoation);
+    const float FinalCameraRotation = FlatCameraRotationAmount * Config::Get().GetInputSettings().UserSensitivity;
+    m_Camera->Rotate((float)MouseDelta.x * FinalCameraRotation, (float)MouseDelta.y * FinalCameraRotation);
     m_Camera->SetPitch(std::clamp(m_Camera->GetPitch(), -89.0f, 89.0f));
     m_Mouse->ResetDelta();
 
