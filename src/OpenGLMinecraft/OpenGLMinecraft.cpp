@@ -37,7 +37,7 @@ void OpenGLMinecraft::Start()
     double LastTime = glfwGetTime(); // Time of last frame
 
     do {
-        m_Running = !m_RenderWindow->ShouldClose();
+        m_Running = !m_RenderWindow->ShouldClose(); // must be at the top so that subsequent Quit() calls in our game code arent overwriting m_Running
 
         double CurrentTime = glfwGetTime();
         DeltaTime = CurrentTime - LastTime;
@@ -98,7 +98,7 @@ void OpenGLMinecraft::OnInit()
     auto ChunkMesh2 = ug.Consume(NormalChunk);
     m_UploadedUnoptimizedMesh = std::make_unique<GPUMesh>(ChunkMesh2.GetMesh());
 
-    // test out the new .GenerateCustom() using a lambda, horribly nested but it should explain how we can generate chunks
+    // test out the new .GenerateCustom() using a lambda, horribly nested but it should explain how we can generate cool looking chunks
     Chunk CustomChunk = Chunk(glm::ivec3(1, 0, 0));
     CustomChunk.GenerateCustom(
         [](Chunk::RawChunk& p_Blocks)
@@ -140,7 +140,7 @@ void OpenGLMinecraft::OnInit()
     auto CustomMesh = g.Consume(CustomChunk);
     m_CustomGeneratedMesh = std::make_unique<GPUMesh>(CustomMesh.GetMesh());
 
-    // creates a chunk with a sphere of bedrock
+    // creates a chunk with a sphere of bedrock at the center of the chunk
     Chunk CustomSphereChunk = Chunk(glm::ivec3(1, 0, 1));
     CustomSphereChunk.GenerateCustom(
         [](Chunk::RawChunk& p_Blocks)
@@ -155,9 +155,12 @@ void OpenGLMinecraft::OnInit()
                 {
                     for(int z = 0; z < p_Blocks.SizeZ(); z++)
                     {
+                        int DeltaX = (x - Center.x) * (x - Center.x);
+                        int DeltaY = (y - Center.y) * (y - Center.y);
+                        int DeltaZ = (z - Center.z) * (z - Center.z);
                         //distance to sphere
-                        int Distance = std::pow(x - Center.x, 2) + std::pow(y - Center.y, 2) + std::pow(z - Center.z, 2);
-                        if(Distance <= std::pow(Radius, 2)) // if on or inside the sphere, add a block
+                        int Distance = DeltaX + DeltaY + DeltaZ;
+                        if(Distance <= (Radius * Radius)) // if on or inside the sphere, add a block
                         {
                             p_Blocks(x, y, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
                         }
@@ -207,9 +210,9 @@ void OpenGLMinecraft::OnUpdate(double DeltaTime)
 void OpenGLMinecraft::OnRender()
 {
     m_Renderer->Begin(m_Camera.get());
-    m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
-    m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
-    m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());
-    m_Renderer->Submit(m_CustomSphereMesh.get(), m_SolidShader.get());
+        m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
+        m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
+        m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());
+        m_Renderer->Submit(m_CustomSphereMesh.get(), m_SolidShader.get());
     m_Renderer->Flush();
 }
