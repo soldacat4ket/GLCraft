@@ -108,13 +108,13 @@ void OpenGLMinecraft::OnInit()
             {
                 for(int z = 0; z < p_Blocks.SizeZ(); z++)
                 {
-                    // generate a height from the x and z where the shortest is 0
+                    // generate a height from the x and z where the shortest is 0 and the tallest is 16 based on x and z
                     const int ChunkHeight = (x / 2) + (x % 2) + (z / 2) + (z % 2);
                     for(int y = 0; y < ChunkHeight; y++)
                     {
                         uint16_t BlockType;
 
-                        // depending on the blocks position, generate a bedrock on the bottom, fill with stone, add 2 dirt, and top with grass
+                        // depending on the blocks height, generate a bedrock on the bottom, fill with stone, add 2 dirt, and top with grass
                         if(y >= ChunkHeight - 1)
                         {
                             BlockType = BlockDatabase::Get().Exchanger().Resolve("vanilla:grass_block");
@@ -140,10 +140,12 @@ void OpenGLMinecraft::OnInit()
     auto CustomMesh = g.Consume(CustomChunk);
     m_CustomGeneratedMesh = std::make_unique<GPUMesh>(CustomMesh.GetMesh());
 
+    // creates a chunk with a sphere of bedrock
     Chunk CustomSphereChunk = Chunk(glm::ivec3(1, 0, 1));
     CustomSphereChunk.GenerateCustom(
         [](Chunk::RawChunk& p_Blocks)
         {
+            // define the sphere
             const glm::ivec3 Center = {p_Blocks.SizeX() / 2, p_Blocks.SizeY() / 2, p_Blocks.SizeZ() / 2};
             const int Radius = 6;
 
@@ -155,7 +157,7 @@ void OpenGLMinecraft::OnInit()
                     {
                         //distance to sphere
                         int Distance = std::pow(x - Center.x, 2) + std::pow(y - Center.y, 2) + std::pow(z - Center.z, 2);
-                        if(Distance <= std::pow(Radius, 2))
+                        if(Distance <= std::pow(Radius, 2)) // if on or inside the sphere, add a block
                         {
                             p_Blocks(x, y, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
                         }

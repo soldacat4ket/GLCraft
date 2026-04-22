@@ -1,8 +1,8 @@
-workspace "OpenGLMinecraftClone"
+workspace "GLCraft"
 	configurations { "Debug", "Release" }
 	platforms { "x86_64" }
 
-project "OpenGLMinecraftClone"
+project "GLCraft"
 	language "C++"
 	cppdialect "C++23"
 	targetdir "bin/%{cfg.buildcfg}-%{cfg.platform}"
