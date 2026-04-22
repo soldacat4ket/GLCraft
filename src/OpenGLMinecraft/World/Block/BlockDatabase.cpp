@@ -39,6 +39,8 @@ BlockData* BlockDatabase::LoadBlockData(nlohmann::json& o)
 
 void BlockDatabase::LoadBlocks(const std::filesystem::path& p_BlockBinFile)
 {
+    LOG_INFO("Loading block data");
+
     std::ifstream BlockBinHandle(p_BlockBinFile);
     ASSERT(BlockBinHandle.is_open());
     
@@ -49,7 +51,7 @@ void BlockDatabase::LoadBlocks(const std::filesystem::path& p_BlockBinFile)
     std::vector<std::string> TempIdList;
     for(auto& [key, value] : TempBlockData.items())
     {
-        LOG_DEBUG("Loading block {} {}", key, value.dump(4));
+        LOG_DEBUG("Loaded block {} {}", key, value.dump(4));
         TempIdList.push_back(key);
         m_Data.push_back(LoadBlockData(value));
     }
