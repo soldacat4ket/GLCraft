@@ -101,7 +101,8 @@ void OpenGLMinecraft::OnInit()
     // test out the new .GenerateCustom() using a lambda, horribly nested but it should explain how we can generate chunks
     Chunk CustomChunk = Chunk(glm::ivec3(1, 0, 0));
     CustomChunk.GenerateCustom(
-        [](Chunk::RawChunk& p_Blocks) {
+        [](Chunk::RawChunk& p_Blocks)
+        {
             // for each column on the x and z axis
             for(int x = 0; x < p_Blocks.SizeX(); x++)
             {
@@ -136,10 +137,36 @@ void OpenGLMinecraft::OnInit()
             }
         }
     );
-
-    //finally build the chunk mesh
-    auto CustomMesh = g.Consume(CustomChunk); // we can reuse the greedy mesher for this custom chunk
+    auto CustomMesh = g.Consume(CustomChunk);
     m_CustomGeneratedMesh = std::make_unique<GPUMesh>(CustomMesh.GetMesh());
+
+    Chunk CustomSphereChunk = Chunk(glm::ivec3(1, 0, 1));
+    CustomSphereChunk.GenerateCustom(
+        [](Chunk::RawChunk& p_Blocks)
+        {
+            const glm::ivec3 Center = {p_Blocks.SizeX() / 2, p_Blocks.SizeY() / 2, p_Blocks.SizeZ() / 2};
+            const int Radius = 6;
+
+            for(int x = 0; x < p_Blocks.SizeX(); x++)
+            {
+                for(int y = 0; y < p_Blocks.SizeY(); y++)
+                {
+                    for(int z = 0; z < p_Blocks.SizeZ(); z++)
+                    {
+                        //distance to sphere
+                        int Distance = std::pow(x - Center.x, 2) + std::pow(y - Center.y, 2) + std::pow(z - Center.z, 2);
+                        if(Distance <= std::pow(Radius, 2))
+                        {
+                            p_Blocks(x, y, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+    auto SphereMesh = g.Consume(CustomSphereChunk);
+    m_CustomSphereMesh = std::make_unique<GPUMesh>(SphereMesh.GetMesh());
 }
 
 void OpenGLMinecraft::OnFree()
@@ -181,5 +208,6 @@ void OpenGLMinecraft::OnRender()
     m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
     m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
     m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());
+    m_Renderer->Submit(m_CustomSphereMesh.get(), m_SolidShader.get());
     m_Renderer->Flush();
 }

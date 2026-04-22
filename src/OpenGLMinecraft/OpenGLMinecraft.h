@@ -35,6 +35,7 @@ protected:
     std::unique_ptr<GPUMesh> m_UploadedMesh;
     std::unique_ptr<GPUMesh> m_UploadedUnoptimizedMesh;
     std::unique_ptr<GPUMesh> m_CustomGeneratedMesh;
+    std::unique_ptr<GPUMesh> m_CustomSphereMesh;
 
     std::unique_ptr<Keyboard> m_Keyboard;
     std::unique_ptr<Mouse> m_Mouse;
