@@ -8,6 +8,7 @@
 
 #define DEFAULT_CONFIG_FILE std::filesystem::current_path() / "res" / "settings.json"
 #define DEFAULT_BLOCKDATA_FILE std::filesystem::current_path() / "res" / "blockdata.json"
+#define DEFAULT_SHADER_PATH std::filesystem::current_path() / "res" / "shaders"
 #define DEFAULT_TEXTURE_PATH std::filesystem::current_path() / "res" / "textures"
 
 class Config : Singleton
@@ -17,7 +18,8 @@ public:
 
     void Load(const std::filesystem::path& p_ConfigPath = DEFAULT_CONFIG_FILE, 
               const std::filesystem::path& p_BlockDataPath = DEFAULT_BLOCKDATA_FILE, 
-              const std::filesystem::path& p_TexturePath = DEFAULT_TEXTURE_PATH);
+              const std::filesystem::path& p_TexturePath = DEFAULT_TEXTURE_PATH,
+              const std::filesystem::path& p_ShaderPath = DEFAULT_SHADER_PATH);
 
     void LoadTexturePacks();
 
@@ -27,13 +29,15 @@ public:
     inline const std::string& GetActivePackName() const { return m_ActivePackName; }
 
     inline const std::filesystem::path& GetTexturePath() const { return m_TexturePath; }
-    inline const std::filesystem::path& GetBlockDataPath() const { return m_BlockDataPath; }
+    inline const std::filesystem::path& GetBlockDataFile() const { return m_BlockDataFile; }
 
     struct GraphicsSettings
     {
         unsigned int DesiredWidthPixels;
         unsigned int DesiredHeightPixels;
         bool Fullscreen;
+        std::filesystem::path SolidVertexShaderFile;
+        std::filesystem::path SolidFragmentShaderFile;
     };
     inline const GraphicsSettings& GetGraphicsSettings() const { return m_GraphicsSettings; }
 
@@ -52,11 +56,14 @@ private:
     nlohmann::json m_TempTextureData;
 
     std::unique_ptr<TexturePack> m_ActivePack;
+
     GraphicsSettings m_GraphicsSettings;
     InputSettings m_InputSettings;
+
     std::filesystem::path m_TexturePath;
-    std::filesystem::path m_BlockDataPath;
-    std::filesystem::path m_ConfigPath;
+    std::filesystem::path m_ShaderPath;
+    std::filesystem::path m_BlockDataFile;
+    std::filesystem::path m_ConfigFile;
     std::string m_ActivePackName;
 };
 

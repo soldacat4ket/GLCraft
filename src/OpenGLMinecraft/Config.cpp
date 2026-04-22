@@ -15,17 +15,19 @@ Config& Config::Get()
     return c;
 }
 
-void Config::Load(const std::filesystem::path& p_ConfigPath, const std::filesystem::path& p_BlockDataPath, const std::filesystem::path& p_TexturePath)
+void Config::Load(const std::filesystem::path& p_ConfigPath, const std::filesystem::path& p_BlockDataPath, const std::filesystem::path& p_TexturePath, const std::filesystem::path& p_ShaderPath)
 {
-    m_ConfigPath = p_ConfigPath;
-    m_BlockDataPath = p_BlockDataPath;
+    m_ConfigFile = p_ConfigPath;
+    m_BlockDataFile = p_BlockDataPath;
     m_TexturePath = p_TexturePath;
+    m_ShaderPath = p_ShaderPath;
 
-    LOG_INFO("Config: {}", m_ConfigPath.string());
-    LOG_INFO("Block data: {}", m_BlockDataPath.string());
+    LOG_INFO("Config: {}", m_ConfigFile.string());
+    LOG_INFO("Block data: {}", m_BlockDataFile.string());
     LOG_INFO("Pack folder: {}", m_TexturePath.string());
+    LOG_INFO("Shader folder: {}", m_ShaderPath.string());
 
-    std::ifstream ConfigHandle(m_ConfigPath);
+    std::ifstream ConfigHandle(m_ConfigFile);
     ASSERT(ConfigHandle.is_open());
 
     nlohmann::json ConfigData = nlohmann::json::parse(ConfigHandle);
@@ -93,6 +95,8 @@ void Config::LoadGraphicsSettings(const nlohmann::json& p_GraphicsSettingsData)
     m_GraphicsSettings.DesiredWidthPixels = p_GraphicsSettingsData.at("resolution").at(0).get<unsigned int>();
     m_GraphicsSettings.DesiredHeightPixels = p_GraphicsSettingsData.at("resolution").at(1).get<unsigned int>();
     m_GraphicsSettings.Fullscreen = p_GraphicsSettingsData.at("fullscreen").get<bool>();
+    m_GraphicsSettings.SolidVertexShaderFile = m_ShaderPath / p_GraphicsSettingsData.at("solidshader").at(0).get<std::filesystem::path>();
+    m_GraphicsSettings.SolidFragmentShaderFile = m_ShaderPath / p_GraphicsSettingsData.at("solidshader").at(1).get<std::filesystem::path>();
 }
 
 void Config::LoadInputSettings(const nlohmann::json& p_InputSettingsData)

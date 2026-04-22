@@ -57,12 +57,10 @@ void OpenGLMinecraft::Quit()
     m_Running = false;
 }
 
-
-
 void OpenGLMinecraft::OnInit()
 {
     Config::Get().Load();
-    BlockDatabase::Get().LoadBlocks(Config::Get().GetBlockDataPath());
+    BlockDatabase::Get().LoadBlocks(Config::Get().GetBlockDataFile());
 
     m_RenderWindow = std::make_unique<RenderWindow>(
         "OpenGLMinecraft", 
@@ -79,6 +77,7 @@ void OpenGLMinecraft::OnInit()
     m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
     m_Camera = std::make_unique<Camera>(m_RenderWindow->GetWindowData().AspectRatioF);
 
+    m_SolidShader = std::make_unique<Shader>(Config::Get().GetGraphicsSettings().SolidVertexShaderFile, Config::Get().GetGraphicsSettings().SolidFragmentShaderFile);
 
     Config::Get().LoadTexturePacks();
     BlockDatabase::Get().RegisterReferenceMap(Config::Get().BuildTextureReferences());
@@ -98,6 +97,49 @@ void OpenGLMinecraft::OnInit()
     ChunkMeshGenerator ug;
     auto ChunkMesh2 = ug.Consume(NormalChunk);
     m_UploadedUnoptimizedMesh = std::make_unique<GPUMesh>(ChunkMesh2.GetMesh());
+
+    // test out the new .GenerateCustom() using a lambda, horribly nested but it should explain how we can generate chunks
+    Chunk CustomChunk = Chunk(glm::ivec3(1, 0, 0));
+    CustomChunk.GenerateCustom(
+        [](Chunk::RawChunk& p_Blocks) {
+            // for each column on the x and z axis
+            for(int x = 0; x < p_Blocks.SizeX(); x++)
+            {
+                for(int z = 0; z < p_Blocks.SizeZ(); z++)
+                {
+                    // generate a height from the x and z where the shortest is 0
+                    const int ChunkHeight = (x / 2) + (x % 2) + (z / 2) + (z % 2);
+                    for(int y = 0; y < ChunkHeight; y++)
+                    {
+                        uint16_t BlockType;
+
+                        // depending on the blocks position, generate a bedrock on the bottom, fill with stone, add 2 dirt, and top with grass
+                        if(y >= ChunkHeight - 1)
+                        {
+                            BlockType = BlockDatabase::Get().Exchanger().Resolve("vanilla:grass_block");
+                        }
+                        else if(y >= ChunkHeight - 3)
+                        {
+                            BlockType = BlockDatabase::Get().Exchanger().Resolve("vanilla:dirt_block");
+                        }
+                        else if(y > 0)
+                        {
+                            BlockType = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
+                        }
+                        else
+                        {
+                            BlockType = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
+                        }
+                        p_Blocks(x, y, z) = BlockType;
+                    }
+                }
+            }
+        }
+    );
+
+    //finally build the chunk mesh
+    auto CustomMesh = g.Consume(CustomChunk); // we can reuse the greedy mesher for this custom chunk
+    m_CustomGeneratedMesh = std::make_unique<GPUMesh>(CustomMesh.GetMesh());
 }
 
 void OpenGLMinecraft::OnFree()
@@ -136,7 +178,8 @@ void OpenGLMinecraft::OnUpdate(double DeltaTime)
 void OpenGLMinecraft::OnRender()
 {
     m_Renderer->Begin(m_Camera.get());
-    m_Renderer->Submit(m_UploadedMesh.get());
-    m_Renderer->Submit(m_UploadedUnoptimizedMesh.get());
+    m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
+    m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
+    m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());
     m_Renderer->Flush();
 }

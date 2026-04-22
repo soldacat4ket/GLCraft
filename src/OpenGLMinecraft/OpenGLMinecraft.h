@@ -27,11 +27,16 @@ protected:
     bool m_Running;
 
     std::unique_ptr<RenderWindow> m_RenderWindow;
-    std::unique_ptr<Camera> m_Camera;
     std::unique_ptr<ChunkRenderer> m_Renderer;
-    std::unique_ptr<Keyboard> m_Keyboard;
-    std::unique_ptr<Mouse> m_Mouse;
+
+    std::unique_ptr<Shader> m_SolidShader;
+    std::unique_ptr<Camera> m_Camera;
+
     std::unique_ptr<GPUMesh> m_UploadedMesh;
     std::unique_ptr<GPUMesh> m_UploadedUnoptimizedMesh;
+    std::unique_ptr<GPUMesh> m_CustomGeneratedMesh;
+
+    std::unique_ptr<Keyboard> m_Keyboard;
+    std::unique_ptr<Mouse> m_Mouse;
 };
 

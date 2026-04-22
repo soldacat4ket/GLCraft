@@ -50,24 +50,32 @@ Chunk::Chunk(const glm::ivec3 p_ChunkPosition)
 
 }
 
+void Chunk::GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction)
+{
+    // generate a chunk full of air for the user function to edit
+    m_Data = RawChunk(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z);
+    m_Data.Fill(BlockDatabase::Get().Exchanger().Resolve("vanilla:air"));
+
+    if(p_GenerationFunction) p_GenerationFunction(m_Data);
+}
+
 void Chunk::Superflat()
 {
     LOG_INFO("Generating superflat chunk at {}, {}, {}", m_Position.x, m_Position.y, m_Position.z);
-    RawChunk Blocks = RawChunk(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z);
-    Blocks.Fill(BlockDatabase::Get().Exchanger().Resolve("vanilla:air"));
+    m_Data = RawChunk(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z);
+    m_Data.Fill(BlockDatabase::Get().Exchanger().Resolve("vanilla:air"));
 
     // construct superflat chunk
     for(size_t z = 0; z < CHUNK_SIZE_Z; z++)
     {
         for(size_t x = 0; x < CHUNK_SIZE_X; x++)
         {
-            Blocks(x, 0, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
-            Blocks(x, 1, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
-            Blocks(x, 2, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
-            Blocks(x, 3, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
-            Blocks(x, 4, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:dirt_block");
-            Blocks(x, 5, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:grass_block");
+            m_Data(x, 0, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
+            m_Data(x, 1, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
+            m_Data(x, 2, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
+            m_Data(x, 3, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block");
+            m_Data(x, 4, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:dirt_block");
+            m_Data(x, 5, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:grass_block");
         }
     }
-    m_Data = Blocks;
 }

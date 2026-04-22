@@ -6,7 +6,8 @@
     },
     "graphicssettings": {
         "resolution": [ 1920, 1080 ],
-        "fullscreen":  true
+        "fullscreen": true,
+        "solidshader": ["chunkvert.glsl", "chunkfrag.glsl"]
     },
     "texturesettings": {
         "activepack": "Default"

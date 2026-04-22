@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <memory>
+#include <functional>
 
 #include <glm/glm.hpp>
 
@@ -30,6 +30,8 @@ public:
     static RLECompressedChunk CompressRLE(const RawChunk& p_Data);
 
     Chunk(glm::ivec3 p_ChunkPosition);
+
+    void GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction);
 
     // generate the chunk such that the bottom layer is bedrock, the next 3 are stone, then 1 layer of dirt, then 1 layer of grass, with the rest filled as air
     void Superflat();
