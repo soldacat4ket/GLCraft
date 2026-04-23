@@ -39,7 +39,7 @@ public:
     inline bool IsLocked() const { return m_Locked; }
     inline const MouseState& GetState() const { return m_State; }
     inline void ResetDelta() { m_State.MouseDelta = {0.0, 0.0}; }
-    MousePos GetPos() const;
+    MousePos GetCurrentPos() const;
 private:
     RenderWindow::WindowHandle m_WindowHandle;
     bool m_RawMouseEnabled;

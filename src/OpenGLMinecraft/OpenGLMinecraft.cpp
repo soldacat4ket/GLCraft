@@ -6,7 +6,6 @@
 #include "OpenGLMinecraft/Debug.h"
 #include "OpenGLMinecraft/Config.h"
 #include "OpenGLMinecraft/Utility/Log.h"
-#include "OpenGLMinecraft/Utility/GLMath.h"
 #include "OpenGLMinecraft/World/Block/BlockDatabase.h"
 #include "OpenGLMinecraft/World/Chunk/Chunk.h"
 #include "OpenGLMinecraft/World/Chunk/ChunkMesh.h"
@@ -75,14 +74,16 @@ void OpenGLMinecraft::OnInit()
     // input objects
     m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
     m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
-    m_Camera = std::make_unique<Camera>(m_RenderWindow->GetWindowData().AspectRatioF);
-
-    m_SolidShader = std::make_unique<Shader>(Config::Get().GetGraphicsSettings().SolidVertexShaderFile, Config::Get().GetGraphicsSettings().SolidFragmentShaderFile);
 
     Config::Get().LoadTexturePacks();
     BlockDatabase::Get().RegisterReferenceMap(Config::Get().BuildTextureReferences());
 
     m_Renderer = std::make_unique<ChunkRenderer>(Config::Get().GetActivePack()->GetTexture());
+    m_SolidShader = std::make_unique<Shader>(Config::Get().GetGraphicsSettings().SolidVertexShaderFile, Config::Get().GetGraphicsSettings().SolidFragmentShaderFile);
+
+
+    // start the player in the middle of the chunk at (0,0,0), facing forward
+    m_Player = std::make_unique<Player>(m_RenderWindow->GetWindowData(), glm::vec3(8.0f, 8.0f, 8.0f), -90.f, 0.0f);
 
     // build superflat chunk at 0,0,0 to be greedy meshed
     Chunk GreedyChunk = Chunk(glm::ivec3(0, 0, 0));
@@ -155,12 +156,12 @@ void OpenGLMinecraft::OnInit()
                 {
                     for(int z = 0; z < p_Blocks.SizeZ(); z++)
                     {
-                        int DeltaX = (x - Center.x) * (x - Center.x);
-                        int DeltaY = (y - Center.y) * (y - Center.y);
-                        int DeltaZ = (z - Center.z) * (z - Center.z);
-                        //distance to sphere
-                        int Distance = DeltaX + DeltaY + DeltaZ;
-                        if(Distance <= (Radius * Radius)) // if on or inside the sphere, add a block
+                        int DeltaX = x - Center.x;
+                        int DeltaY = y - Center.y;
+                        int DeltaZ = z - Center.z;
+
+                        int DistanceToSphere = DeltaX * DeltaX + DeltaY * DeltaY + DeltaZ * DeltaZ;
+                        if(DistanceToSphere <= (Radius * Radius)) // if on or inside the sphere, add a block
                         {
                             p_Blocks(x, y, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
                         }
@@ -183,33 +184,20 @@ void OpenGLMinecraft::OnStart()
 {
     m_RenderWindow->SetVSync(true);
     m_RenderWindow->SetClearColor({1.0f, 0.0f, 1.0f, 1.0f});
-    m_Camera->SetPos({8.0f, 8.0f, 8.0f});
     m_Mouse->RawMouseMovement();
 }
 
 void OpenGLMinecraft::OnUpdate(double DeltaTime)
 {
-    const Mouse::MousePos& MouseDelta = m_Mouse->GetState().MouseDelta;
-
-    const float FlatCameraRotationAmount = 0.1f;
-    const float FinalCameraRotation = FlatCameraRotationAmount * Config::Get().GetInputSettings().UserSensitivity;
-    m_Camera->Rotate((float)MouseDelta.x * FinalCameraRotation, (float)MouseDelta.y * FinalCameraRotation);
-    m_Camera->SetPitch(std::clamp(m_Camera->GetPitch(), -89.0f, 89.0f));
+    m_Player->HandleInput(m_Mouse.get(), m_Keyboard.get(), DeltaTime);
     m_Mouse->ResetDelta();
 
-
-    const float CamMovementSpeed = 10.0f;
-    float ScaledCamMovement = CamMovementSpeed * (float)DeltaTime;
     if(m_Keyboard->IsKeyPressed(GLFW_KEY_ESCAPE)) Quit();
-    if(m_Keyboard->IsKeyPressed(GLFW_KEY_W)) m_Camera->MoveForward(ScaledCamMovement);
-    if(m_Keyboard->IsKeyPressed(GLFW_KEY_S)) m_Camera->MoveBack(ScaledCamMovement);
-    if(m_Keyboard->IsKeyPressed(GLFW_KEY_A)) m_Camera->MoveLeft(ScaledCamMovement);
-    if(m_Keyboard->IsKeyPressed(GLFW_KEY_D)) m_Camera->MoveRight(ScaledCamMovement);
 }
 
 void OpenGLMinecraft::OnRender()
 {
-    m_Renderer->Begin(m_Camera.get());
+    m_Renderer->Begin(m_Player->GetCamera()->GetViewProjectionMatrix());
         m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
         m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
         m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());

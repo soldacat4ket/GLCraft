@@ -36,6 +36,8 @@ public:
         unsigned int DesiredWidthPixels;
         unsigned int DesiredHeightPixels;
         bool Fullscreen;
+        float DesiredFov;
+        float RenderDistanceBlocks;
         std::filesystem::path SolidVertexShaderFile;
         std::filesystem::path SolidFragmentShaderFile;
     };

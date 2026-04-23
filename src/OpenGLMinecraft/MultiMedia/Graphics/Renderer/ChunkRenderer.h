@@ -15,7 +15,7 @@ class ChunkRenderer
 public:
     ChunkRenderer(const Texture* p_AtlasImage);
 
-    void Begin(const Camera* p_Cam, bool p_Wireframe = false);
+    void Begin(glm::mat4 p_ViewProjectionMatrix, bool p_Wireframe = false);
     void Submit(const GPUMesh* p_ChunkMesh, const Shader* p_ChunkShader);
     void Flush();
 private:

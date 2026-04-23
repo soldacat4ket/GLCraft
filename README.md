@@ -22,7 +22,7 @@ Before building the project, I recommend the following enviornment:
 * 64 bit Windows 10+
 * Visual Studio 2026
 * OpenGL 3.3+ compatible hardware
-* Newest/Platform Compatible version of dependancies(will eventually be compiled from source)
+* Newest/Platform compatible version of dependancies(will eventually be compiled from source)
 
 Build systems are managed through premake
 

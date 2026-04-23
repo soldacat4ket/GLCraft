@@ -7,7 +7,9 @@
     "graphicssettings": {
         "resolution": [ 1920, 1080 ],
         "fullscreen": true,
-        "solidshader": ["chunkvert.glsl", "chunkfrag.glsl"]
+        "solidshader": [ "chunkvert.glsl", "chunkfrag.glsl" ],
+        "fov": 60.0,
+        "renderdistance":  100.0
     },
     "texturesettings": {
         "activepack": "Default"

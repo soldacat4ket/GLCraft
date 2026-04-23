@@ -12,9 +12,9 @@ ChunkRenderer::ChunkRenderer(const Texture* p_AtlasImage)
     m_SceneData.AtlasImage = p_AtlasImage;
 }
 
-void ChunkRenderer::Begin(const Camera* p_Cam, bool p_Wireframe)
+void ChunkRenderer::Begin(const glm::mat4 p_ViewProjetionMatrix, bool p_Wireframe)
 {
-    m_SceneData.ViewProjectionMatrix = p_Cam->GetViewProjectionMatrix();
+    m_SceneData.ViewProjectionMatrix = p_ViewProjetionMatrix;
     m_Status = true;
     m_Wireframe = p_Wireframe;
     auto DrawMode = m_Wireframe ? GL_LINE : GL_FILL;

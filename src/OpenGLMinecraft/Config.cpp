@@ -95,6 +95,8 @@ void Config::LoadGraphicsSettings(const nlohmann::json& p_GraphicsSettingsData)
     m_GraphicsSettings.DesiredWidthPixels = p_GraphicsSettingsData.at("resolution").at(0).get<unsigned int>();
     m_GraphicsSettings.DesiredHeightPixels = p_GraphicsSettingsData.at("resolution").at(1).get<unsigned int>();
     m_GraphicsSettings.Fullscreen = p_GraphicsSettingsData.at("fullscreen").get<bool>();
+    m_GraphicsSettings.DesiredFov = p_GraphicsSettingsData.at("fov").get<float>();;
+    m_GraphicsSettings.RenderDistanceBlocks = p_GraphicsSettingsData.at("renderdistance").get<float>();;
     m_GraphicsSettings.SolidVertexShaderFile = m_ShaderPath / p_GraphicsSettingsData.at("solidshader").at(0).get<std::filesystem::path>();
     m_GraphicsSettings.SolidFragmentShaderFile = m_ShaderPath / p_GraphicsSettingsData.at("solidshader").at(1).get<std::filesystem::path>();
 }

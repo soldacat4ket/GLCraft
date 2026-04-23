@@ -40,7 +40,7 @@ void Mouse::RawMouseMovement(const bool p_Enabled)
     glfwSetInputMode(m_WindowHandle, GLFW_RAW_MOUSE_MOTION, p_Enabled ? GLFW_TRUE : GLFW_FALSE);
 }
 
-Mouse::MousePos Mouse::GetPos() const
+Mouse::MousePos Mouse::GetCurrentPos() const
 {
     MousePos p;
     glfwGetCursorPos(m_WindowHandle, &p.x, &p.y);

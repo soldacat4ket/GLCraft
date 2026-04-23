@@ -24,7 +24,7 @@ void Log::Init(
         // No point making a console logger for release builds, potentially up FileSink log level in release as well
         #ifdef NDEBUG
         auto FileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(p_LogFile.string(), true);
-        FileSink->set_level(RELEASE_LOG_LEVEL);
+        FileSink->set_level(RELEASE_LOG_LEVEL); // discard parameter log level for final release log level
         #else
         auto ConsoleSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
         ConsoleSink->set_level(p_ConsoleLevel);

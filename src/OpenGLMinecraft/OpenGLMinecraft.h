@@ -1,8 +1,10 @@
 #pragma once
 
+#include <memory>
+
+#include "OpenGLMinecraft/Player.h"
 #include "OpenGLMinecraft/MultiMedia/Graphics/RenderWindow.h"
 #include "OpenGLMinecraft/MultiMedia/Graphics/Camera.h"
-#include "OpenGLMinecraft/MultiMedia/Graphics/Renderer/ChunkRenderer.h"
 #include "OpenGLMinecraft/MultiMedia/Graphics/Renderer/ChunkRenderer.h"
 #include "OpenGLMinecraft/MultiMedia/Input/Keyboard.h"
 #include "OpenGLMinecraft/MultiMedia/Input/Mouse.h"
@@ -30,7 +32,6 @@ protected:
     std::unique_ptr<ChunkRenderer> m_Renderer;
 
     std::unique_ptr<Shader> m_SolidShader;
-    std::unique_ptr<Camera> m_Camera;
 
     std::unique_ptr<GPUMesh> m_UploadedMesh;
     std::unique_ptr<GPUMesh> m_UploadedUnoptimizedMesh;
@@ -39,5 +40,7 @@ protected:
 
     std::unique_ptr<Keyboard> m_Keyboard;
     std::unique_ptr<Mouse> m_Mouse;
+
+    std::unique_ptr<Player> m_Player;
 };
 
