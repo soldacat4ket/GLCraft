@@ -40,6 +40,8 @@ public:
         float RenderDistanceBlocks;
         std::filesystem::path SolidVertexShaderFile;
         std::filesystem::path SolidFragmentShaderFile;
+        unsigned int ChunkLoadDistance;
+        bool VSync;
     };
     inline const GraphicsSettings& GetGraphicsSettings() const { return m_GraphicsSettings; }
 

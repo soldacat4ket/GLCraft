@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include <glm/glm.hpp>
 
 #include "OpenGLMinecraft/MultiMedia/Graphics/GLCommon.h"

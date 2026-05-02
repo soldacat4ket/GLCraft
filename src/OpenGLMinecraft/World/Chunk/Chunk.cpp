@@ -47,25 +47,16 @@ Chunk::RLECompressedChunk Chunk::CompressRLE(const RawChunk& p_Data)
 Chunk::Chunk(const glm::ivec3 p_ChunkPosition)
     :m_Position(p_ChunkPosition), m_Data(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z)
 {
-
+    Clear();
 }
 
-void Chunk::GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction)
+void Chunk::Clear()
 {
-    // generate a chunk full of air for the user function to edit
-    m_Data = RawChunk(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z);
     m_Data.Fill(BlockDatabase::Get().Exchanger().Resolve("vanilla:air"));
-
-    if(p_GenerationFunction) p_GenerationFunction(m_Data);
 }
 
 void Chunk::Superflat()
 {
-    LOG_INFO("Generating superflat chunk at {}, {}, {}", m_Position.x, m_Position.y, m_Position.z);
-    m_Data = RawChunk(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z);
-    m_Data.Fill(BlockDatabase::Get().Exchanger().Resolve("vanilla:air"));
-
-    // construct superflat chunk
     for(size_t z = 0; z < CHUNK_SIZE_Z; z++)
     {
         for(size_t x = 0; x < CHUNK_SIZE_X; x++)
@@ -78,4 +69,9 @@ void Chunk::Superflat()
             m_Data(x, 5, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:grass_block");
         }
     }
+}
+
+void Chunk::GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction)
+{
+    if(p_GenerationFunction) p_GenerationFunction(m_Data);
 }

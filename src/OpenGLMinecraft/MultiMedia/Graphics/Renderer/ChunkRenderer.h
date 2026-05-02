@@ -3,8 +3,8 @@
 #include <queue>
 
 #include "OpenGLMinecraft/MultiMedia/Graphics/Camera.h"
-#include "OpenGLMinecraft/MultiMedia/Graphics/Objects/GPUMesh.h"
-#include "OpenGLMinecraft/MultiMedia/Graphics/Shaders/Shader.h"
+#include "OpenGLMinecraft/MultiMedia/Graphics/GPUMesh.h"
+#include "OpenGLMinecraft/MultiMedia/Graphics/Shader.h"
 #include "OpenGLMinecraft/MultiMedia/Graphics/Texture/Texture.h"
 
 #define DEFAULT_CHUNK_VERT std::filesystem::current_path() / "res" / "shaders" / "chunkvert.glsl"

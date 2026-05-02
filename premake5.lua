@@ -7,6 +7,7 @@ project "GLCraft"
 	cppdialect "C++23"
 	targetdir "bin/%{cfg.buildcfg}-%{cfg.platform}"
 	objdir "bin-int/%{cfg.buildcfg}-%{cfg.platform}"
+	warnings "Extra"
 
 	files { 
 		"src/**.h", 

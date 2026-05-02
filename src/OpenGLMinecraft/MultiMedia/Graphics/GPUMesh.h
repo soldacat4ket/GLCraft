@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OpenGLMinecraft/Utility/NonCopyable.h"
-#include "OpenGLMinecraft/MultiMedia/Graphics/Objects/Mesh.h"
+#include "OpenGLMinecraft/MultiMedia/Graphics/Mesh.h"
 #include "OpenGLMinecraft/MultiMedia/Graphics/Objects/VertexArray.h"
 
 class GPUMesh : NonCopyable

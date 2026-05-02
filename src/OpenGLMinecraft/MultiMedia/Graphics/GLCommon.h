@@ -9,4 +9,9 @@
 #endif
 
 #include <glad/glad.h>
+
+#ifdef APIENTRY
+#undef APIENTRY
+#endif
+
 #include <GLFW/glfw3.h>

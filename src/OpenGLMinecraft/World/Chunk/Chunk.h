@@ -7,8 +7,9 @@
 
 #include "OpenGLMinecraft/Utility/Array3D.h"
 
+// fixed height chunks of 256 blocks, could update to 16 for an infinate build height
 #define CHUNK_SIZE_X 16
-#define CHUNK_SIZE_Y 16
+#define CHUNK_SIZE_Y 256
 #define CHUNK_SIZE_Z 16
 #define CHUNK_SIZE_TOTAL CHUNK_SIZE_X*CHUNK_SIZE_Y*CHUNK_SIZE_Z
 
@@ -31,10 +32,12 @@ public:
 
     Chunk(glm::ivec3 p_ChunkPosition);
 
-    void GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction);
+    void Clear();
 
-    // generate the chunk such that the bottom layer is bedrock, the next 3 are stone, then 1 layer of dirt, then 1 layer of grass, with the rest filled as air
+    // static generator for basic chunk, bedrock -> 3 stone -> dirt -> grass
     void Superflat();
+
+    void GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction);
 
     inline glm::ivec3 GetPos() const { return m_Position; }
     inline const RawChunk& GetBlocks() const { return m_Data; }

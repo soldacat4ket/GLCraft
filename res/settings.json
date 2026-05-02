@@ -9,7 +9,9 @@
         "fullscreen": true,
         "solidshader": [ "chunkvert.glsl", "chunkfrag.glsl" ],
         "fov": 60.0,
-        "renderdistance":  100.0
+        "renderdistance": 100.0,
+        "chunkloaddistance": 16,
+        "vsync":  true
     },
     "texturesettings": {
         "activepack": "Default"

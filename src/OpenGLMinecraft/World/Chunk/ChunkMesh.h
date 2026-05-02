@@ -4,7 +4,7 @@
 #include <array>
 #include <glm/glm.hpp>
 
-#include "OpenGLMinecraft/MultiMedia/Graphics/Objects/Mesh.h"
+#include "OpenGLMinecraft/MultiMedia/Graphics/Mesh.h"
 
 class ChunkMesh
 {

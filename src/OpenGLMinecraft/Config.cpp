@@ -99,6 +99,8 @@ void Config::LoadGraphicsSettings(const nlohmann::json& p_GraphicsSettingsData)
     m_GraphicsSettings.RenderDistanceBlocks = p_GraphicsSettingsData.at("renderdistance").get<float>();;
     m_GraphicsSettings.SolidVertexShaderFile = m_ShaderPath / p_GraphicsSettingsData.at("solidshader").at(0).get<std::filesystem::path>();
     m_GraphicsSettings.SolidFragmentShaderFile = m_ShaderPath / p_GraphicsSettingsData.at("solidshader").at(1).get<std::filesystem::path>();
+    m_GraphicsSettings.ChunkLoadDistance = p_GraphicsSettingsData.at("chunkloaddistance").get<unsigned int>();
+    m_GraphicsSettings.VSync = p_GraphicsSettingsData.at("vsync").get<bool>();
 }
 
 void Config::LoadInputSettings(const nlohmann::json& p_InputSettingsData)

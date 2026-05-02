@@ -1,6 +1,7 @@
 #include "OpenGLMinecraft/OpenGLMinecraft.h"
 #include "OpenGLMinecraft/Utility/Log.h"
 
+// currently hardcoded main for released window only builds
 #ifdef NDEBUG
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nShowCmd)
 #else

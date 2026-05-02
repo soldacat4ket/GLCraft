@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include "OpenGLMinecraft/Utility/Log.h"
-#include "OpenGLMinecraft/World/Block/BlockIdExchanger.h"
+#include "OpenGLMinecraft/World/Block/BlockDatabase.h"
 
 ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
 {
@@ -16,19 +16,19 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
 
     // for each block test if each face should be added
     GlobalBlockData::AdjacentBlocks Adjacent;
-    for(unsigned int x = 0; x < CHUNK_SIZE_X; x++)
+    for(unsigned int x = 0; x < Blocks.SizeX(); x++)
     {
-        for(unsigned int y = 0; y < CHUNK_SIZE_Y; y++)
+        for(unsigned int y = 0; y < Blocks.SizeY(); y++)
         {
-            for(unsigned int z = 0; z < CHUNK_SIZE_Z; z++)
+            for(unsigned int z = 0; z < Blocks.SizeZ(); z++)
             {
-                const uint16_t& Block = Blocks(x, y, z);
-                if(Block == BlockDatabase::Get().Exchanger().Resolve("vanilla:air"))
+                const uint16_t& BlockId = Blocks(x, y, z);
+                if(BlockId == BlockDatabase::Get().Exchanger().Resolve("vanilla:air"))
                 {
                     continue;
                 }
                 Adjacent.Of(x, y, z);
-                const BlockData& Data = BlockDatabase::Get().GetData(Block);
+                const BlockData& Data = BlockDatabase::Get().GetData(BlockId);
                 const glm::uvec3 Pos = {x, y, z};
 
                 TryAddFace(
@@ -39,7 +39,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
                     Pos,
                     Adjacent.Down,
                     p_Chunk.GetPos(), 
-                    Block
+                    BlockId
                 );
                 TryAddFace(
                     Mesh,
@@ -49,7 +49,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
                     Pos,
                     Adjacent.Up,
                     p_Chunk.GetPos(),
-                    Block
+                    BlockId
                 );
                 TryAddFace(
                     Mesh,
@@ -59,7 +59,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
                     Pos,
                     Adjacent.Left,
                     p_Chunk.GetPos(),
-                    Block
+                    BlockId
                 );
                 TryAddFace(
                     Mesh,
@@ -69,7 +69,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
                     Pos,
                     Adjacent.Right,
                     p_Chunk.GetPos(),
-                    Block
+                    BlockId
                 );
                 TryAddFace(
                     Mesh,
@@ -79,7 +79,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
                     Pos,
                     Adjacent.Front,
                     p_Chunk.GetPos(),
-                    Block
+                    BlockId
                 );
                 TryAddFace(
                     Mesh,
@@ -89,7 +89,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
                     Pos,
                     Adjacent.Back,
                     p_Chunk.GetPos(),
-                    Block
+                    BlockId
                 );
             }
         }
@@ -111,9 +111,9 @@ void GreedyChunkMeshGenerator::TryAddFace(ChunkMesh& p_Mesh,
                                           const glm::ivec3 p_ChunkPos,
                                           const uint16_t p_BlockId)
 {
-    bool IsAdjacentBlockInChunk = p_AdjacentBlockPos.x >= 0 && p_AdjacentBlockPos.x < CHUNK_SIZE_X &&
-                                p_AdjacentBlockPos.y >= 0 && p_AdjacentBlockPos.y < CHUNK_SIZE_Y &&
-                                p_AdjacentBlockPos.z >= 0 && p_AdjacentBlockPos.z < CHUNK_SIZE_Z;
+    bool IsAdjacentBlockInChunk = p_AdjacentBlockPos.x >= 0 && p_AdjacentBlockPos.x < p_Blocks.SizeX() &&
+                                  p_AdjacentBlockPos.y >= 0 && p_AdjacentBlockPos.y < p_Blocks.SizeY() &&
+                                  p_AdjacentBlockPos.z >= 0 && p_AdjacentBlockPos.z < p_Blocks.SizeZ();
 
     // add other chunk checking for blocks on edge of chunks
     if(!IsAdjacentBlockInChunk) // for now just add the faces on chunk edges for visual purposes

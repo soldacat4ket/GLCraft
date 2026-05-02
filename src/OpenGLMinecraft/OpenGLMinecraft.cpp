@@ -31,7 +31,9 @@ void OpenGLMinecraft::Start()
 {
     LOG_INFO("Starting game loop");
     m_Running = true;
+
     OnStart();
+
     double DeltaTime = 0.0;	// Time between current frame and last frame
     double LastTime = glfwGetTime(); // Time of last frame
 
@@ -71,16 +73,29 @@ void OpenGLMinecraft::OnInit()
     #ifdef NDEBUG
     m_RenderWindow->SetGLCapability(RenderWindow::RendererCapability::CULLFACE, true);
     #endif
-    // input objects
-    m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
-    m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
 
     Config::Get().LoadTexturePacks();
     BlockDatabase::Get().RegisterReferenceMap(Config::Get().BuildTextureReferences());
 
+    m_RenderWindow->SetVSync(Config::Get().GetGraphicsSettings().VSync);
+    m_RenderWindow->SetClearColor({1.0f, 0.0f, 1.0f, 1.0f});
+}
+
+void OpenGLMinecraft::OnFree()
+{
+    
+}
+
+void OpenGLMinecraft::OnStart()
+{
+    // input objects
+    m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
+    m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
+
+    m_Mouse->RawMouseMovement();
+
     m_Renderer = std::make_unique<ChunkRenderer>(Config::Get().GetActivePack()->GetTexture());
     m_SolidShader = std::make_unique<Shader>(Config::Get().GetGraphicsSettings().SolidVertexShaderFile, Config::Get().GetGraphicsSettings().SolidFragmentShaderFile);
-
 
     // start the player in the middle of the chunk at (0,0,0), facing forward
     m_Player = std::make_unique<Player>(m_RenderWindow->GetWindowData(), glm::vec3(8.0f, 8.0f, 8.0f), -90.f, 0.0f);
@@ -141,13 +156,13 @@ void OpenGLMinecraft::OnInit()
     auto CustomMesh = g.Consume(CustomChunk);
     m_CustomGeneratedMesh = std::make_unique<GPUMesh>(CustomMesh.GetMesh());
 
-    // creates a chunk with a sphere of bedrock at the center of the chunk
+    // creates a chunk with a sphere of bedrock at the center of the chunk, updated with a fixed y of 8
     Chunk CustomSphereChunk = Chunk(glm::ivec3(1, 0, 1));
     CustomSphereChunk.GenerateCustom(
         [](Chunk::RawChunk& p_Blocks)
         {
             // define the sphere
-            const glm::ivec3 Center = {p_Blocks.SizeX() / 2, p_Blocks.SizeY() / 2, p_Blocks.SizeZ() / 2};
+            const glm::ivec3 Center = {p_Blocks.SizeX() / 2, 8, p_Blocks.SizeZ() / 2};
             const int Radius = 6;
 
             for(int x = 0; x < p_Blocks.SizeX(); x++)
@@ -173,18 +188,6 @@ void OpenGLMinecraft::OnInit()
 
     auto SphereMesh = g.Consume(CustomSphereChunk);
     m_CustomSphereMesh = std::make_unique<GPUMesh>(SphereMesh.GetMesh());
-}
-
-void OpenGLMinecraft::OnFree()
-{
-    
-}
-
-void OpenGLMinecraft::OnStart()
-{
-    m_RenderWindow->SetVSync(true);
-    m_RenderWindow->SetClearColor({1.0f, 0.0f, 1.0f, 1.0f});
-    m_Mouse->RawMouseMovement();
 }
 
 void OpenGLMinecraft::OnUpdate(double DeltaTime)
