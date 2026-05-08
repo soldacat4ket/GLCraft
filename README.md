@@ -43,38 +43,4 @@ Premake may be able to generate project files for other platforms, but dependanc
 
 I plan to solve these issues through wider platform testing and compiling dependancies from source through seperate projects
 
-If you run into any issues building for other platforms, feel free to let me know. I aim to make this project fully compatible with Windows, MacOS, and Linux
-
-## Project File Structure
-```.
-├── res/                        # Assets & settings
-│   ├── logs/                   # Game logs
-│   ├── shaders/                # GLSL source files
-│   ├── textures/               # Texture packs
-│   ├── blockdata.json          # Structured block definitions
-│   └── settings.json           # User configuration & preferences
-│
-├── src/
-│   ├── Main.cpp                # Application entry point
-│   └── OpenGLMinecraft/
-│       ├── MultiMedia/
-│       │   ├── Graphics/
-│       │   │   ├── Objects/    # OpenGL wrappers (VAO, VBO, IBO)
-│       │   │   ├── Renderer/   # Render pipelines & draw calls
-│       │   │   ├── Shaders/    # Shader compilation logic
-│       │   │   └── Texture/    # Texture resources & atlas calculations
-│       │   └── Input/          # GLFW-based input handling
-│       ├── World/
-│       │   ├── Block/          # ID exchange logic (std::string ↔ uint16_t)
-│       │   └── Chunk/          # Editable chunks & mesh building
-│       ├── Physics/            # [WIP] Collision
-│       └── Utility/            # Abstract structures & math helpers
-│
-├── vendor/                     # Third-party dependencies
-│   ├── glad/                   # OpenGL loader
-│   ├── glfw-3.4/               # Windowing & context
-│   ├── glm/                    # OpenGL math
-│   ├── nlohmann-json/          # JSON parsing support
-│   ├── spdlog-1.x/             # Fast C++ logging
-│   └── stb_image/              # Image loading utilities
-└── premake5.lua                # Project build script```
+If you run into any issues building for other platforms, feel free to let me know. I aim to make this project fully compatible with Windows, MacOS, and Linux 
