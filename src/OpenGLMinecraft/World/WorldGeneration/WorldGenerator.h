@@ -7,7 +7,6 @@
 class WorldGenerator
 {
 public:
-    // WILL ALLOCATE ON THE HEAP, DELETE THEM
-    virtual Chunk* GenerateChunk(glm::ivec3 p_ChunkPosition) = 0;
+    virtual Chunk::RawChunk GenerateChunk(glm::ivec3 p_ChunkPosition) = 0;
 private:
 };

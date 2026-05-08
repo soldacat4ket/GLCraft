@@ -75,3 +75,13 @@ void Chunk::GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction)
 {
     if(p_GenerationFunction) p_GenerationFunction(m_Data);
 }
+
+void Chunk::EditBlock(glm::uvec3 p_BlockPos, uint16_t p_NewBlock)
+{
+    bool IsInBounds = p_BlockPos.x > 0 && p_BlockPos.x < m_Data.SizeX() &&
+                      p_BlockPos.y > 0 && p_BlockPos.y < m_Data.SizeY() &&
+                      p_BlockPos.z > 0 && p_BlockPos.z < m_Data.SizeZ();
+
+    ASSERT(IsInBounds);
+    m_Data(p_BlockPos.x, p_BlockPos.y, p_BlockPos.z) = p_NewBlock;
+}

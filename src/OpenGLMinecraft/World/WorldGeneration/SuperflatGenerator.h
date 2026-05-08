@@ -7,7 +7,7 @@
 
 // todo: pregenerate a chunk with the layout and simply copy for generation
 // a more customizable superflat world
-class SuperflatGenerator : WorldGenerator
+class SuperflatGenerator : public WorldGenerator
 {
 public:
     struct SuperflatLayer
@@ -19,9 +19,12 @@ public:
 
     SuperflatGenerator(SuperflatLayout p_Layout);
 
-    virtual Chunk* GenerateChunk(glm::ivec3 p_ChunkPosition) override;
+    virtual Chunk::RawChunk GenerateChunk(glm::ivec3 p_ChunkPosition) override;
 private:
-    void GenerateLayer(SuperflatLayer p_Layer, Chunk::RawChunk& p_Chunk, size_t& p_BlockHeight, size_t x, size_t z);
+    Chunk::RawChunk BuildBaseChunk(SuperflatLayout p_Layout);
+    void GenerateLayer(uint16_t p_Block, Chunk::RawChunk& p_Chunk, size_t p_BlockHeight);
+
+    Chunk::RawChunk m_BaseChunk;
 
     SuperflatLayout m_WorldLayout;
 };

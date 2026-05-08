@@ -12,7 +12,7 @@ ChunkMeshGenerator::ChunkMeshGenerator()
 
 ChunkMesh ChunkMeshGenerator::Consume(const Chunk& p_Chunk)
 {
-    LOG_DEBUG("Building mesh for chunk {}, {}, {}", p_Chunk.GetPos().x, p_Chunk.GetPos().y, p_Chunk.GetPos().z);
+    LOG_TRACE("Building mesh for chunk {}, {}, {}", p_Chunk.GetPos().x, p_Chunk.GetPos().y, p_Chunk.GetPos().z);
 
 
     ChunkMesh Mesh(p_Chunk.GetPos());
@@ -40,7 +40,7 @@ ChunkMesh ChunkMeshGenerator::Consume(const Chunk& p_Chunk)
 
     auto EndTime = std::chrono::steady_clock::now();
     auto TimeToComplete = std::chrono::duration_cast<std::chrono::milliseconds>(EndTime - StartTime);
-    LOG_DEBUG("Done in {}ms. Unoptimized mesh has {} visible blocks, {} verts, and {} inds", TimeToComplete.count(), Mesh.GetFaceCount() / 6, Mesh.GetMesh().Data.size(), Mesh.GetMesh().Indices.size());
+    LOG_TRACE("Done in {}ms. Unoptimized mesh has {} visible blocks, {} verts, and {} inds", TimeToComplete.count(), Mesh.GetFaceCount() / 6, Mesh.GetMesh().Data.size(), Mesh.GetMesh().Indices.size());
 
     return Mesh;
 }

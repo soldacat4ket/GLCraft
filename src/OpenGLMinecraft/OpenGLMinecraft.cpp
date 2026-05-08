@@ -6,6 +6,7 @@
 #include "OpenGLMinecraft/Debug.h"
 #include "OpenGLMinecraft/Config.h"
 #include "OpenGLMinecraft/Utility/Log.h"
+#include "OpenGLMinecraft/World/WorldGeneration/SuperflatGenerator.h"
 #include "OpenGLMinecraft/World/Block/BlockDatabase.h"
 #include "OpenGLMinecraft/World/Chunk/Chunk.h"
 #include "OpenGLMinecraft/World/Chunk/ChunkMesh.h"
@@ -34,22 +35,41 @@ void OpenGLMinecraft::Start()
 
     OnStart();
 
-    double DeltaTime = 0.0;	// Time between current frame and last frame
-    double LastTime = glfwGetTime(); // Time of last frame
-
+    double DeltaTime = 0.0;	// time between current frame and last frame
+    int FrameCount = 0;
+    double LastCountedTime = glfwGetTime(); // last time the frame count has been updated
+    double LastTime = glfwGetTime(); // time of last frame
+    const double TimePerFrame = 1.0 / Config::Get().GetGraphicsSettings().TargetFPS;
     do {
         m_Running = !m_RenderWindow->ShouldClose(); // must be at the top so that subsequent Quit() calls in our game code arent overwriting m_Running
 
         double CurrentTime = glfwGetTime();
         DeltaTime = CurrentTime - LastTime;
-        LastTime = CurrentTime;
+        if(CurrentTime - LastCountedTime >= 1.0)
+        {
+            m_FPS = double(FrameCount) / (CurrentTime - LastCountedTime);
 
-        OnUpdate(DeltaTime);
+            std::string TitleWithCounter = std::string(m_RenderWindow->GetWindowData().Title) + "| FPS: " + std::to_string(m_FPS);
 
-        m_RenderWindow->Clear();
-        OnRender();
-        m_RenderWindow->Swap();
-        m_RenderWindow->Poll();
+            m_RenderWindow->UpdateTitleManual(TitleWithCounter);
+
+            FrameCount = 0;
+            LastCountedTime = CurrentTime;
+        }
+
+        bool ShouldAdvanceFrame = !Config::Get().GetGraphicsSettings().VSync || DeltaTime >= TimePerFrame;
+        if(ShouldAdvanceFrame)
+        {
+            OnUpdate(DeltaTime);
+            m_RenderWindow->Clear();
+            OnRender();
+            m_RenderWindow->Swap();
+
+            FrameCount++;
+            LastTime = CurrentTime;
+        }
+
+        m_RenderWindow->Poll(); // always poll events, keeps window responding
     } while(m_Running);
 }
 
@@ -86,29 +106,17 @@ void OpenGLMinecraft::OnFree()
     
 }
 
-void OpenGLMinecraft::OnStart()
+void OpenGLMinecraft::LoadTestChunks()
 {
-    // input objects
-    m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
-    m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
-
-    m_Mouse->RawMouseMovement();
-
-    m_Renderer = std::make_unique<ChunkRenderer>(Config::Get().GetActivePack()->GetTexture());
-    m_SolidShader = std::make_unique<Shader>(Config::Get().GetGraphicsSettings().SolidVertexShaderFile, Config::Get().GetGraphicsSettings().SolidFragmentShaderFile);
-
-    // start the player in the middle of the chunk at (0,0,0), facing forward
-    m_Player = std::make_unique<Player>(m_RenderWindow->GetWindowData(), glm::vec3(8.0f, 8.0f, 8.0f), -90.f, 0.0f);
-
     // build superflat chunk at 0,0,0 to be greedy meshed
-    Chunk GreedyChunk = Chunk(glm::ivec3(0, 0, 0));
+    Chunk GreedyChunk = Chunk(glm::ivec3(-1, 0, -1));
     GreedyChunk.Superflat();
     GreedyChunkMeshGenerator g;
     auto GreedyChunkMesh = g.Consume(GreedyChunk);
     m_UploadedMesh = std::make_unique<GPUMesh>(GreedyChunkMesh.GetMesh());
 
     // another superflat directly next to other, meshed without optimization
-    Chunk NormalChunk = Chunk(glm::ivec3(0, 0, 1));
+    Chunk NormalChunk = Chunk(glm::ivec3(0, 0, -1));
     NormalChunk.Superflat();
     ChunkMeshGenerator ug;
     auto ChunkMesh2 = ug.Consume(NormalChunk);
@@ -162,7 +170,7 @@ void OpenGLMinecraft::OnStart()
         [](Chunk::RawChunk& p_Blocks)
         {
             // define the sphere
-            const glm::ivec3 Center = {p_Blocks.SizeX() / 2, 8, p_Blocks.SizeZ() / 2};
+            const glm::ivec3 Center = {8, 8, 8};
             const int Radius = 6;
 
             for(int x = 0; x < p_Blocks.SizeX(); x++)
@@ -176,7 +184,7 @@ void OpenGLMinecraft::OnStart()
                         int DeltaZ = z - Center.z;
 
                         int DistanceToSphere = DeltaX * DeltaX + DeltaY * DeltaY + DeltaZ * DeltaZ;
-                        if(DistanceToSphere <= (Radius * Radius)) // if on or inside the sphere, add a block
+                        if(DistanceToSphere <= (Radius * Radius)) // add bedrock in sphere
                         {
                             p_Blocks(x, y, z) = BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block");
                         }
@@ -190,10 +198,53 @@ void OpenGLMinecraft::OnStart()
     m_CustomSphereMesh = std::make_unique<GPUMesh>(SphereMesh.GetMesh());
 }
 
-void OpenGLMinecraft::OnUpdate(double DeltaTime)
+void OpenGLMinecraft::SubmitTestChunks()
+{
+    m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
+    m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
+    m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());
+    m_Renderer->Submit(m_CustomSphereMesh.get(), m_SolidShader.get());
+}
+
+void OpenGLMinecraft::OnStart()
+{
+    // input objects
+    m_Keyboard = std::make_unique<Keyboard>(*m_RenderWindow);
+    m_Mouse = std::make_unique<Mouse>(*m_RenderWindow);
+
+    m_Mouse->RawMouseMovement();
+
+    m_Renderer = std::make_unique<ChunkRenderer>(Config::Get().GetActivePack()->GetTexture());
+    m_SolidShader = std::make_unique<Shader>(Config::Get().GetGraphicsSettings().SolidVertexShaderFile, Config::Get().GetGraphicsSettings().SolidFragmentShaderFile);
+
+    // start the player in the middle of the chunk at (0,0,0), facing forward
+    m_Player = std::move(std::make_unique<FreeCamPlayerController>(m_RenderWindow->GetWindowData(), glm::vec3(8.0f, 8.0f, 8.0f), -90.f, 0.0f));
+
+    SuperflatGenerator::SuperflatLayout Layout;
+    Layout.push_back({BlockDatabase::Get().Exchanger().Resolve("vanilla:bedrock_block"), 1});
+    Layout.push_back({BlockDatabase::Get().Exchanger().Resolve("vanilla:stone_block"), 64});
+    Layout.push_back({BlockDatabase::Get().Exchanger().Resolve("vanilla:dirt_block"), 2});
+    Layout.push_back({BlockDatabase::Get().Exchanger().Resolve("vanilla:grass_block"), 1});
+    auto Generator = std::make_unique<SuperflatGenerator>(Layout);
+
+    m_World = std::make_unique<World>(
+        std::unique_ptr<WorldGenerator>(std::move(Generator)), 
+        std::filesystem::path("res/saves/testworld.gcw"), 
+        static_cast<int>(Config::Get().GetGraphicsSettings().ChunkLoadDistance)
+    );
+    
+    //LoadTestChunks(); // test functions which directly load chunks and renders them regardless of the world structure
+}
+
+void OpenGLMinecraft::OnUpdate(const double DeltaTime)
 {
     m_Player->HandleInput(m_Mouse.get(), m_Keyboard.get(), DeltaTime);
     m_Mouse->ResetDelta();
+
+    glm::ivec3 PlayerChunkPos = m_Player->GetPosition() / glm::vec3(CHUNK_SIZE_X, CHUNK_SIZE_Y, CHUNK_SIZE_Z);
+    //glm::ivec3 PlayerChunkPos = glm::ivec3(0, 0, 0);
+    m_World->LoadNextChunk(PlayerChunkPos);
+    //m_World->UnloadNextChunk(PlayerChunkPos);
 
     if(m_Keyboard->IsKeyPressed(GLFW_KEY_ESCAPE)) Quit();
 }
@@ -201,9 +252,12 @@ void OpenGLMinecraft::OnUpdate(double DeltaTime)
 void OpenGLMinecraft::OnRender()
 {
     m_Renderer->Begin(m_Player->GetCamera()->GetViewProjectionMatrix());
-        m_Renderer->Submit(m_UploadedMesh.get(), m_SolidShader.get());
-        m_Renderer->Submit(m_UploadedUnoptimizedMesh.get(), m_SolidShader.get());
-        m_Renderer->Submit(m_CustomGeneratedMesh.get(), m_SolidShader.get());
-        m_Renderer->Submit(m_CustomSphereMesh.get(), m_SolidShader.get());
+    auto Chunks = m_World->GetChunkData();
+    for(auto [Pos, Data] : Chunks)
+    {
+        m_Renderer->Submit(Data.UploadedMesh, m_SolidShader.get());
+    }
+
+    //SubmitTestChunks();
     m_Renderer->Flush();
 }

@@ -20,6 +20,7 @@ struct ChunkRLESection
     uint16_t Id;
 };
 
+// remove position attribute from chunk? member is used for mesh generation based on position but World holds position as keys to corresponding chunks
 class Chunk
 {
 public:
@@ -34,10 +35,12 @@ public:
 
     void Clear();
 
-    // static generator for basic chunk, bedrock -> 3 stone -> dirt -> grass
+    // fills chunk, bedrock -> 3 stone -> dirt -> grass
     void Superflat();
 
     void GenerateCustom(std::function<void(RawChunk&)> p_GenerationFunction);
+    void EditBlock(glm::uvec3 p_BlockPos, uint16_t p_NewBlock);
+    inline void WriteBlocks(RawChunk c) { m_Data = c; }
 
     inline glm::ivec3 GetPos() const { return m_Position; }
     inline const RawChunk& GetBlocks() const { return m_Data; }

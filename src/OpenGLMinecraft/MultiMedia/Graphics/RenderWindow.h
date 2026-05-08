@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <glm/glm.hpp>
 
 #include "OpenGLMinecraft/MultiMedia/Graphics/GLCommon.h"
@@ -20,6 +21,7 @@ public:
     inline bool ShouldClose() const { return glfwWindowShouldClose(m_WindowHandle); };
     inline const WindowHandle GetWindowHandle() const { return (const WindowHandle)m_WindowHandle; }
 
+    inline void UpdateTitleManual(std::string p_NewTitle) { glfwSetWindowTitle(m_WindowHandle, p_NewTitle.c_str()); };
     inline void SetClearColor(glm::vec4 p_Color) { glClearColor(p_Color.x, p_Color.y, p_Color.z, p_Color.w); }
     inline void SetVSync(bool p_Enabled) { glfwSwapInterval(p_Enabled); }
 

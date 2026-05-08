@@ -3,7 +3,7 @@
 #include "OpenGLMinecraft/Debug.h"
 
 SuperflatGenerator::SuperflatGenerator(const SuperflatLayout p_Layout)
-    :m_WorldLayout(p_Layout)
+    :m_WorldLayout(p_Layout), m_BaseChunk(BuildBaseChunk(p_Layout))
 {
     size_t MaxHeight = 0;
     for(auto Section : m_WorldLayout)
@@ -13,32 +13,37 @@ SuperflatGenerator::SuperflatGenerator(const SuperflatLayout p_Layout)
     ASSERT(MaxHeight < CHUNK_SIZE_Y);
 }
 
-Chunk* SuperflatGenerator::GenerateChunk(glm::ivec3 p_ChunkPosition)
+Chunk::RawChunk SuperflatGenerator::GenerateChunk(glm::ivec3 p_ChunkPosition)
 {
-    Chunk* c = new Chunk(p_ChunkPosition);
-    c->GenerateCustom(
-        [this, &p_ChunkPosition](Chunk::RawChunk& p_Blocks)
-        {
-            for(size_t x = 0; x < p_Blocks.SizeX(); x++)
-            {
-                for(size_t z = 0; z < p_Blocks.SizeZ(); z++)
-                {
-                    size_t TrackedHeight = 0;
-                    for(auto Section : m_WorldLayout)
-                    {
-                        GenerateLayer(Section, p_Blocks, TrackedHeight, x, z);
-                    }
-                }
-            }
-        });
-    return c;
+    return m_BaseChunk;
 }
 
-void SuperflatGenerator::GenerateLayer(const SuperflatLayer p_Layer, Chunk::RawChunk& p_Chunk, size_t& p_BlockHeight, const size_t x, const size_t z)
+Chunk::RawChunk SuperflatGenerator::BuildBaseChunk(const SuperflatLayout p_Layout)
 {
-    for(size_t FinalHeight = p_BlockHeight; FinalHeight < p_Layer.Height; FinalHeight++)
+    Chunk c = Chunk({0,0,0});
+    c.GenerateCustom(
+        [this, p_Layout](Chunk::RawChunk& p_Blocks)
+        {
+            size_t TrackedHeight = 0;
+            for(auto Section : p_Layout)
+            {
+                for(size_t y = TrackedHeight; y < TrackedHeight + Section.Height; y++)
+                {
+                    GenerateLayer(Section.Block, p_Blocks, y);
+                }
+                TrackedHeight += Section.Height;
+            }
+        });
+    return c.GetBlocks();
+}
+
+void SuperflatGenerator::GenerateLayer(const uint16_t p_Block, Chunk::RawChunk& p_Chunk, const size_t p_BlockHeight)
+{
+    for(size_t x = 0; x < p_Chunk.SizeX(); x++)
     {
-        p_Chunk(x, FinalHeight, z) = p_Layer.Block;
-        p_BlockHeight++;
-    }
+        for(size_t z = 0; z < p_Chunk.SizeZ(); z++)
+        {
+            p_Chunk(x, p_BlockHeight, z) = p_Block;
+        }
+    }          
 }

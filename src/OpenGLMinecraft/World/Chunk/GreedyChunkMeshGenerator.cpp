@@ -7,7 +7,7 @@
 
 ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
 {
-    LOG_DEBUG("Building mesh for chunk {}, {}, {}", p_Chunk.GetPos().x, p_Chunk.GetPos().y, p_Chunk.GetPos().z);
+    LOG_TRACE("Building mesh for chunk {}, {}, {}", p_Chunk.GetPos().x, p_Chunk.GetPos().y, p_Chunk.GetPos().z);
 
     ChunkMesh Mesh(p_Chunk.GetPos());
     const Chunk::RawChunk& Blocks = p_Chunk.GetBlocks();
@@ -97,7 +97,7 @@ ChunkMesh GreedyChunkMeshGenerator::Consume(const Chunk& p_Chunk)
 
     auto EndTime = std::chrono::steady_clock::now();
     auto TimeToComplete = std::chrono::duration_cast<std::chrono::milliseconds>(EndTime - StartTime);
-    LOG_DEBUG("Done in {}ms. Greedy mesh has {} visible faces, {} verts, and {} inds", TimeToComplete.count(), Mesh.GetFaceCount(), Mesh.GetMesh().Data.size(), Mesh.GetMesh().Indices.size());
+    LOG_TRACE("Done in {}ms. Greedy mesh has {} visible faces, {} verts, and {} inds", TimeToComplete.count(), Mesh.GetFaceCount(), Mesh.GetMesh().Data.size(), Mesh.GetMesh().Indices.size());
 
     return Mesh;
 }
@@ -118,12 +118,14 @@ void GreedyChunkMeshGenerator::TryAddFace(ChunkMesh& p_Mesh,
     // add other chunk checking for blocks on edge of chunks
     if(!IsAdjacentBlockInChunk) // for now just add the faces on chunk edges for visual purposes
     {
+        #ifndef NDEBUG
         p_Mesh.AddFace(
             p_BlockFace,
             p_TextureCoords,
             p_ChunkPos,
             p_BlockPos
         );
+        #endif
         return;
     };
 

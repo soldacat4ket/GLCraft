@@ -1,12 +1,13 @@
-#include "Player.h"
+#include "FreeCamPlayerController.h"
 
 #include <algorithm>
 
 #include "OpenGLMinecraft/Config.h"
 
-Player::Player(const RenderWindow::WindowData& p_WindowData, const glm::vec3 p_Position, const float p_Yaw, const float p_Pitch)
-    :m_Position(p_Position), m_Yaw(p_Yaw), m_Pitch(p_Pitch)
+FreeCamPlayerController::FreeCamPlayerController(const RenderWindow::WindowData& p_WindowData, const glm::vec3 p_Position, const float p_Yaw, const float p_Pitch)
+    :m_Yaw(p_Yaw), m_Pitch(p_Pitch)
 {
+    m_Position = p_Position;
     const float CameraNearPlane = 0.1f;
     m_PlayerCam = std::make_unique<Camera>(p_WindowData.AspectRatioF, // aspect ratio
                                            CameraNearPlane, // near plane
@@ -15,7 +16,7 @@ Player::Player(const RenderWindow::WindowData& p_WindowData, const glm::vec3 p_P
     UpdateCamera();
 }
 
-void Player::HandleInput(const Mouse* p_Mouse, const Keyboard* p_Keyboard, const double p_DeltaTime)
+void FreeCamPlayerController::HandleInput(const Mouse* p_Mouse, const Keyboard* p_Keyboard, const double p_DeltaTime)
 {
 
     const Mouse::MousePos& MouseDelta = p_Mouse->GetState().MouseDelta;
@@ -30,8 +31,9 @@ void Player::HandleInput(const Mouse* p_Mouse, const Keyboard* p_Keyboard, const
     // clamp the pitch since weird things happen if the front and up vector align
     m_Pitch = std::clamp(m_Pitch, -89.0f, 90.0f);
 
-    const float MovementSpeed = 10.0f;
+    const float MovementSpeed = 30.0f;
     float ScaledCamMovement = MovementSpeed * (float)p_DeltaTime;
+   
     if(p_Keyboard->IsKeyPressed(GLFW_KEY_W)) MoveForward(ScaledCamMovement);
     if(p_Keyboard->IsKeyPressed(GLFW_KEY_S)) MoveBack(ScaledCamMovement);
     if(p_Keyboard->IsKeyPressed(GLFW_KEY_A)) MoveLeft(ScaledCamMovement);
@@ -41,7 +43,7 @@ void Player::HandleInput(const Mouse* p_Mouse, const Keyboard* p_Keyboard, const
 
 }
 
-void Player::UpdateCamera()
+void FreeCamPlayerController::UpdateCamera()
 {
     m_PlayerCam->SetPosition(m_Position + glm::vec3(0.0f, 1.0f, 0.0f)); // set camera at 1 block higher than the players position
     

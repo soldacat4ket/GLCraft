@@ -38,6 +38,7 @@ public:
         bool Fullscreen;
         float DesiredFov;
         float RenderDistanceBlocks;
+        double TargetFPS;
         std::filesystem::path SolidVertexShaderFile;
         std::filesystem::path SolidFragmentShaderFile;
         unsigned int ChunkLoadDistance;

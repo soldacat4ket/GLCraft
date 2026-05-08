@@ -8,6 +8,7 @@ project "GLCraft"
 	targetdir "bin/%{cfg.buildcfg}-%{cfg.platform}"
 	objdir "bin-int/%{cfg.buildcfg}-%{cfg.platform}"
 	warnings "Extra"
+	multiprocessorcompile "on"
 
 	files { 
 		"src/**.h", 

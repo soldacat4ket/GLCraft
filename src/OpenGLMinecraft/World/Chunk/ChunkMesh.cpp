@@ -23,10 +23,12 @@ void ChunkMesh::AddFace(
 
     // classic floating point precision bs, chunks very far from the origin store very large floats for their verts
     // fix? idfk, maybe send position data to shaders
+
+    // CAST IT ALL TO FLOATS!!!!!!!!!!!
     const glm::vec3 BlockOffset = {
-        p_ChunkPosition.x * CHUNK_SIZE_X + p_BlockPosition.x,
-        p_ChunkPosition.y * CHUNK_SIZE_Y + p_BlockPosition.y,
-        p_ChunkPosition.z * CHUNK_SIZE_Z + p_BlockPosition.z
+        ((float)p_ChunkPosition.x * (float)CHUNK_SIZE_X) + (float)p_BlockPosition.x,
+        ((float)p_ChunkPosition.y * (float)CHUNK_SIZE_Y) + (float)p_BlockPosition.y,
+        ((float)p_ChunkPosition.z * (float)CHUNK_SIZE_Z) + (float)p_BlockPosition.z
     };
 
     // group the vertex data by 3 and texture data by 2, adding the common demoninator of 4 vertices
